@@ -1,22 +1,36 @@
-﻿using System.Diagnostics;
+﻿using System.Text.Json;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Pokedex.Models;
+using Pokedex.Services;
 
 namespace Pokedex.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly IPokeService _pokeService;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger, IPokeService service)
     {
         _logger = logger;
+        _pokeService = service;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string tipo)
     {
-        return View();
+        var pokes = _pokeService.GetPokedexDto();
+        ViewData["filter"] = string.IsNullOrEmpty(tipo) ? "all" : tipo;
+        return View(pokes);
     }
+
+    public IActionResult Details(int Numero)
+    {
+        var pokemon = _pokeService.GetDetailedPokemon(Numero);
+        return View(pokemon);
+    }
+
+    
 
     public IActionResult Privacy()
     {
